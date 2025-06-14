@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { analyticsLogger } = require('../utils/logger');
+const { analytics } = require('../utils/logger'); // Import the analytics function directly
 
 class AnalyticsService {
   constructor() {
@@ -45,8 +45,8 @@ class AnalyticsService {
     }
     this.dailyCounters.goalSelections[goal]++;
     
-    // Log to analytics file
-    analyticsLogger.analytics('goal_selection', {
+    // Log to analytics file - use the analytics function directly
+    analytics('goal_selection', {
       goal,
       date,
       timestamp
@@ -67,7 +67,7 @@ class AnalyticsService {
     this.dailyCounters.requests++;
     this.dailyCounters.successfulRequests++;
     
-    analyticsLogger.analytics('successful_request', {
+    analytics('successful_request', {
       ...requestData,
       date,
       timestamp
@@ -87,7 +87,7 @@ class AnalyticsService {
     this.dailyCounters.requests++;
     this.dailyCounters.errors++;
     
-    analyticsLogger.analytics('failed_request', {
+    analytics('failed_request', {
       ...requestData,
       date,
       timestamp
@@ -225,83 +225,21 @@ class AnalyticsService {
         result[dateStr] = analytics[dateStr] || this.getEmptyDayData(dateStr);
       }
       
-      return result;
-      
-    } catch (error) {
-      console.error('Error reading analytics:', error);
-      return { error: 'Failed to read analytics data' };
-    }
-  }
-  
-  /**
-   * Get summary analytics across multiple days
-   * @param {number} days - Number of days to look back
-   * @returns {Object} Summary analytics
-   */
-  async getSummaryAnalytics(days = 7) {
-    try {
-      const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-      
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
-      
-      const rangeData = await this.getDailyAnalytics(startDateStr, endDateStr);
-      
-      // Calculate summary
-      let totalRequests = 0;
-      let totalSuccessful = 0;
-      let totalFailed = 0;
-      let allGoalSelections = {};
-      let uniqueIPs = new Set();
-      
-      Object.values(rangeData).forEach(dayData => {
-        if (dayData.totalRequests) {
-          totalRequests += dayData.totalRequests;
-          totalSuccessful += dayData.successfulRequests || 0;
-          totalFailed += dayData.failedRequests || 0;
-          
-          // Aggregate goal selections
-          Object.entries(dayData.goalSelections || {}).forEach(([goal, count]) => {
-            allGoalSelections[goal] = (allGoalSelections[goal] || 0) + count;
-          });
-          
-          // Aggregate unique IPs
-          (dayData.uniqueIPs || []).forEach(ip => uniqueIPs.add(ip));
-        }
-      });
-      
-      // Calculate popular goals
-      const sortedGoals = Object.entries(allGoalSelections)
-        .sort(([,a], [,b]) => b - a)
-        .map(([goal, count]) => ({ goal, count, percentage: ((count / totalRequests) * 100).toFixed(1) }));
-      
       return {
-        period: `${days} days`,
-        startDate: startDateStr,
-        endDate: endDateStr,
-        summary: {
-          totalRequests,
-          successfulRequests: totalSuccessful,
-          failedRequests: totalFailed,
-          successRate: totalRequests > 0 ? ((totalSuccessful / totalRequests) * 100).toFixed(1) : '0',
-          uniqueUsers: uniqueIPs.size,
-          popularGoals: sortedGoals
-        },
-        dailyData: rangeData
+        dateRange: { startDate, endDate },
+        data: result
       };
       
     } catch (error) {
-      console.error('Error generating summary analytics:', error);
-      return { error: 'Failed to generate summary analytics' };
+      console.error('Error reading analytics:', error);
+      return null;
     }
   }
   
   /**
    * Get empty day data structure
-   * @param {string} date - Date string
-   * @returns {Object} Empty day data
+   * @param {string} date - Date in YYYY-MM-DD format
+   * @returns {Object} Empty day data structure
    */
   getEmptyDayData(date) {
     return {
@@ -319,7 +257,15 @@ class AnalyticsService {
   }
   
   /**
-   * Reset daily counters at midnight
+   * Get current in-memory counters
+   * @returns {Object} Current daily counters
+   */
+  getCurrentCounters() {
+    return this.dailyCounters;
+  }
+  
+  /**
+   * Reset daily counters (called automatically at midnight)
    */
   resetCountersDaily() {
     const now = new Date();
@@ -337,9 +283,89 @@ class AnalyticsService {
         successfulRequests: 0
       };
       
-      // Set up next reset
-      this.resetCountersDaily();
+      // Set up recurring reset every 24 hours
+      setInterval(() => {
+        this.dailyCounters = {
+          requests: 0,
+          goalSelections: {},
+          errors: 0,
+          successfulRequests: 0
+        };
+      }, 24 * 60 * 60 * 1000);
+      
     }, msUntilMidnight);
+  }
+  
+  /**
+   * Get analytics summary for dashboard
+   * @param {number} days - Number of days to include in summary
+   * @returns {Object} Analytics summary
+   */
+  async getAnalyticsSummary(days = 7) {
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+      
+      const analytics = await this.getDailyAnalytics(
+        startDate.toISOString().split('T')[0],
+        endDate.toISOString().split('T')[0]
+      );
+      
+      if (!analytics) return null;
+      
+      const summary = {
+        period: { startDate: startDate.toISOString().split('T')[0], endDate: endDate.toISOString().split('T')[0] },
+        totalRequests: 0,
+        successfulRequests: 0,
+        failedRequests: 0,
+        errorRate: 0,
+        popularGoals: {},
+        uniqueIPs: new Set(),
+        dailyAverages: {
+          requests: 0,
+          successfulRequests: 0,
+          failedRequests: 0
+        }
+      };
+      
+      Object.values(analytics.data).forEach(dayData => {
+        summary.totalRequests += dayData.totalRequests;
+        summary.successfulRequests += dayData.successfulRequests;
+        summary.failedRequests += dayData.failedRequests;
+        
+        // Merge goal selections
+        Object.entries(dayData.goalSelections).forEach(([goal, count]) => {
+          summary.popularGoals[goal] = (summary.popularGoals[goal] || 0) + count;
+        });
+        
+        // Collect unique IPs
+        dayData.uniqueIPs.forEach(ip => summary.uniqueIPs.add(ip));
+      });
+      
+      // Calculate error rate
+      if (summary.totalRequests > 0) {
+        summary.errorRate = (summary.failedRequests / summary.totalRequests * 100).toFixed(2);
+      }
+      
+      // Calculate daily averages
+      const activeDays = Object.keys(analytics.data).length;
+      if (activeDays > 0) {
+        summary.dailyAverages.requests = Math.round(summary.totalRequests / activeDays);
+        summary.dailyAverages.successfulRequests = Math.round(summary.successfulRequests / activeDays);
+        summary.dailyAverages.failedRequests = Math.round(summary.failedRequests / activeDays);
+      }
+      
+      // Convert Set to count
+      summary.uniqueIPCount = summary.uniqueIPs.size;
+      delete summary.uniqueIPs;
+      
+      return summary;
+      
+    } catch (error) {
+      console.error('Error generating analytics summary:', error);
+      return null;
+    }
   }
 }
 

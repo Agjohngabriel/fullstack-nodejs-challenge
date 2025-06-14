@@ -1,0 +1,19 @@
+{
+  "2025-06-14": {
+    "date": "2025-06-14",
+    "totalRequests": 0,
+    "successfulRequests": 0,
+    "failedRequests": 0,
+    "goalSelections": {
+      "sleep": 2,
+      "recovery": 1,
+      "longevity": 1,
+      "energy": 1
+    },
+    "errors": [],
+    "averageResponseTime": 0,
+    "uniqueIPs": [],
+    "firstRequest": null,
+    "lastRequest": null
+  }
+}
