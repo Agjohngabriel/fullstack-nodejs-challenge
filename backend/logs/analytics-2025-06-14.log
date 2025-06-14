@@ -8,3 +8,5 @@
 {"age":18,"date":"2025-06-14","eventType":"analytics","goal":"sleep","level":"info","message":"successful_request","requestId":"4a0e420b-8262-4f11-8819-2d2f6cb8fc8b","service":"peptide-suggestions-analytics","suggestionsCount":2,"timestamp":"2025-06-14T21:26:38.488Z"}
 {"date":"2025-06-14","eventType":"analytics","goal":"energy","level":"info","message":"goal_selection","service":"peptide-suggestions-analytics","timestamp":"2025-06-14T21:27:38.359Z"}
 {"age":34,"date":"2025-06-14","eventType":"analytics","goal":"energy","level":"info","message":"successful_request","requestId":"c208669d-5adc-4d4e-b819-0f85aec679ab","service":"peptide-suggestions-analytics","suggestionsCount":3,"timestamp":"2025-06-14T21:27:38.362Z"}
+{"date":"2025-06-14","eventType":"analytics","goal":"focus","level":"info","message":"goal_selection","service":"peptide-suggestions-analytics","timestamp":"2025-06-14T21:32:09.893Z"}
+{"age":23,"date":"2025-06-14","eventType":"analytics","goal":"focus","level":"info","message":"successful_request","requestId":"b8289ef8-c6c8-4e48-b064-a033b8edce0b","service":"peptide-suggestions-analytics","suggestionsCount":2,"timestamp":"2025-06-14T21:32:09.895Z"}

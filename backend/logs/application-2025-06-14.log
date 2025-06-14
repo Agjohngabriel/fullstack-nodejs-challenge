@@ -416,3 +416,244 @@
   "service": "peptide-suggestions-api",
   "version": "1.0.0"
 }
+2025-06-14 22:31:16 [INFO]: 🚀 Server running on port 3001 {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "environment": "development",
+  "port": "3001"
+}
+2025-06-14 22:31:16 [INFO]: 🔗 Available endpoints: {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "health": "http://localhost:3001/health",
+  "suggestions": "http://localhost:3001/suggestions",
+  "analytics": "http://localhost:3001/analytics"
+}
+2025-06-14 22:31:54 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 200,
+  "duration": "4ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:31:54 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:09 [INFO]: Processing suggestions request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "requestId": "b8289ef8-c6c8-4e48-b064-a033b8edce0b",
+  "age": 23,
+  "goal": "focus",
+  "ip": "::ffff:127.0.0.1",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0"
+}
+2025-06-14 22:32:09 [INFO]: Generating suggestions {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "age": 23,
+  "goal": "focus"
+}
+2025-06-14 22:32:09 [INFO]: Successfully generated suggestions {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "requestId": "b8289ef8-c6c8-4e48-b064-a033b8edce0b",
+  "suggestionsCount": 2
+}
+2025-06-14 22:32:09 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "POST",
+  "url": "/",
+  "status": 200,
+  "duration": "13ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:10 [INFO]: 🚀 Server running on port 3001 {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "environment": "development",
+  "port": "3001"
+}
+2025-06-14 22:32:10 [INFO]: 🔗 Available endpoints: {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "health": "http://localhost:3001/health",
+  "suggestions": "http://localhost:3001/suggestions",
+  "analytics": "http://localhost:3001/analytics"
+}
+2025-06-14 22:32:12 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 200,
+  "duration": "5ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:12 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "0ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:14 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 304,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:14 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 304,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 304,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 304,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 304,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 304,
+  "duration": "1ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:15 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "0ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:16 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/analytics",
+  "status": 304,
+  "duration": "0ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:16 [INFO]: HTTP Request {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0",
+  "method": "GET",
+  "url": "/",
+  "status": 404,
+  "duration": "0ms",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:138.0) Gecko/20100101 Firefox/138.0",
+  "ip": "::ffff:127.0.0.1"
+}
+2025-06-14 22:32:49 [INFO]: Received SIGINT, shutting down gracefully {
+  "service": "peptide-suggestions-api",
+  "version": "1.0.0"
+}
