@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "/Users/nariels/ReactjsProjects/fullstack-nodejs-challenge/backend/logs/.6a73b344a79ddc70786f58c7cb09caccba8f2196-audit.json",
+    "files": [
+        {
+            "date": 1749935021111,
+            "name": "/Users/nariels/ReactjsProjects/fullstack-nodejs-challenge/backend/logs/application-2025-06-14.log",
+            "hash": "45ce906dd7b813108b5e40f80f27cb005c55bd8ed413fc834b5c65e1962295d0"
+        }
+    ],
+    "hashType": "sha256"
+}
