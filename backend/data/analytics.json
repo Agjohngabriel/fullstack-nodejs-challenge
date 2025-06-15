@@ -23,9 +23,10 @@
     "successfulRequests": 0,
     "failedRequests": 0,
     "goalSelections": {
-      "energy": 2,
-      "sleep": 2,
-      "weight_management": 2
+      "energy": 3,
+      "sleep": 3,
+      "weight_management": 2,
+      "immune_support": 2
     },
     "errors": [],
     "averageResponseTime": 0,
