@@ -8,11 +8,33 @@ require('dotenv').config();
 
 const logger = require('./utils/logger');
 const analyticsService = require('./services/analyticsService');
+const userService = require('./services/userService');
+const database = require('./config/database');
+
+// Import routes
 const suggestionsRouter = require('./routes/suggestions');
+const authRouter = require('./routes/auth');
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Initialize database and services
+async function initializeApp() {
+  try {
+    // Initialize database
+    await database.initialize();
+    logger.info('Database initialized successfully');
+
+    // Initialize user service
+    userService.initialize();
+    logger.info('User service initialized successfully');
+
+  } catch (error) {
+    logger.error('Failed to initialize application:', error);
+    process.exit(1);
+  }
+}
 
 // Security middleware
 app.use(helmet({
@@ -59,7 +81,8 @@ app.use((req, res, next) => {
       status: res.statusCode,
       duration: `${duration}ms`,
       userAgent: req.get('User-Agent'),
-      ip: req.ip
+      ip: req.ip,
+      userId: req.user?.id || 'anonymous'
     });
   });
   
@@ -72,29 +95,83 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    version: process.env.npm_package_version || '1.0.0'
+    version: process.env.npm_package_version || '1.0.0',
+    database: 'connected',
+    services: {
+      userService: 'ready',
+      analytics: 'ready'
+    }
   });
 });
 
 // API routes
+app.use('/auth', authRouter);
 app.use('/suggestions', suggestionsRouter);
 
 // Analytics endpoint
 app.get('/analytics', async (req, res) => {
   try {
     const analytics = await analyticsService.getDailyAnalytics();
-    res.json(analytics);
+    res.json({
+      success: true,
+      data: analytics
+    });
   } catch (error) {
     logger.error('Analytics endpoint error:', error);
-    res.status(500).json({ error: 'Failed to retrieve analytics' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to retrieve analytics' 
+    });
   }
+});
+
+// API documentation endpoint
+app.get('/api-docs', (req, res) => {
+  res.json({
+    title: 'Peptide Suggestions API',
+    version: '1.0.0',
+    description: 'API for personalized peptide recommendations with user authentication',
+    endpoints: {
+      authentication: {
+        'POST /auth/register': 'Register a new user account',
+        'POST /auth/login': 'Login with email and password',
+        'GET /auth/profile': 'Get user profile (requires authentication)',
+        'PUT /auth/profile': 'Update user profile (requires authentication)',
+        'POST /auth/change-password': 'Change user password (requires authentication)',
+        'POST /auth/refresh': 'Refresh JWT token (requires authentication)',
+        'GET /auth/suggestions': 'Get user suggestion history (requires authentication)',
+        'DELETE /auth/account': 'Delete user account (requires authentication)',
+        'GET /auth/verify': 'Verify token validity (requires authentication)'
+      },
+      suggestions: {
+        'POST /suggestions': 'Get peptide suggestions (works with or without authentication)'
+      },
+      system: {
+        'GET /health': 'Health check endpoint',
+        'GET /analytics': 'Get analytics data',
+        'GET /api-docs': 'This documentation'
+      }
+    },
+    authentication: {
+      type: 'Bearer Token',
+      description: 'Include JWT token in Authorization header: "Bearer <token>"'
+    },
+    rateLimit: {
+      general: '100 requests per 15 minutes',
+      authentication: '5 requests per 15 minutes'
+    }
+  });
 });
 
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
-    error: 'Endpoint not found',
-    message: `The requested endpoint ${req.method} ${req.path} does not exist`
+    success: false,
+    error: {
+      message: `The requested endpoint ${req.method} ${req.path} does not exist`,
+      code: 'ENDPOINT_NOT_FOUND'
+    },
+    availableEndpoints: '/api-docs'
   });
 });
 
@@ -116,6 +193,7 @@ app.use((error, req, res, next) => {
     url: req.url,
     method: req.method,
     ip: req.ip,
+    userId: req.user?.id,
     timestamp: new Date().toISOString()
   });
   
@@ -138,28 +216,41 @@ app.use((error, req, res, next) => {
 });
 
 // Graceful shutdown
-process.on('SIGINT', () => {
-  logger.info('Received SIGINT, shutting down gracefully');
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  logger.info('Received SIGTERM, shutting down gracefully');
-  process.exit(0);
-});
-
-// Start server
-app.listen(PORT, () => {
-  logger.info(`🚀 Server running on port ${PORT}`, {
-    environment: process.env.NODE_ENV || 'development',
-    port: PORT
-  });
+const gracefulShutdown = async () => {
+  logger.info('Received shutdown signal, closing server gracefully...');
   
-  logger.info('🔗 Available endpoints:', {
-    health: `http://localhost:${PORT}/health`,
-    suggestions: `http://localhost:${PORT}/suggestions`,
-    analytics: `http://localhost:${PORT}/analytics`
+  try {
+    await database.close();
+    logger.info('Database connection closed');
+  } catch (error) {
+    logger.error('Error closing database:', error);
+  }
+  
+  process.exit(0);
+};
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
+
+// Initialize and start server
+initializeApp().then(() => {
+  app.listen(PORT, () => {
+    logger.info(`🚀 Server running on port ${PORT}`, {
+      environment: process.env.NODE_ENV || 'development',
+      port: PORT
+    });
+    
+    logger.info('🔗 Available endpoints:', {
+      health: `http://localhost:${PORT}/health`,
+      auth: `http://localhost:${PORT}/auth`,
+      suggestions: `http://localhost:${PORT}/suggestions`,
+      analytics: `http://localhost:${PORT}/analytics`,
+      docs: `http://localhost:${PORT}/api-docs`
+    });
   });
+}).catch((error) => {
+  logger.error('Failed to start server:', error);
+  process.exit(1);
 });
 
 module.exports = app;

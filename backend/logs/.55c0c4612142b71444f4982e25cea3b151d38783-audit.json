@@ -9,6 +9,11 @@
             "date": 1749935021114,
             "name": "/Users/nariels/ReactjsProjects/fullstack-nodejs-challenge/backend/logs/exceptions-2025-06-14.log",
             "hash": "2fc1bd9875e341d039f9be796828e92568d0dd11958528728b3cf63a1cb62e1c"
+        },
+        {
+            "date": 1749965076833,
+            "name": "/Users/nariels/ReactjsProjects/fullstack-nodejs-challenge/backend/logs/exceptions-2025-06-15.log",
+            "hash": "5889f378e719abb04e1384ca48bf749bf46a75f646b722bf4e5abb46e378f720"
         }
     ],
     "hashType": "sha256"

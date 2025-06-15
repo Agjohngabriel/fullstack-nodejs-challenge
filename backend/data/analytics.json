@@ -16,5 +16,21 @@
     "uniqueIPs": [],
     "firstRequest": null,
     "lastRequest": null
+  },
+  "2025-06-15": {
+    "date": "2025-06-15",
+    "totalRequests": 0,
+    "successfulRequests": 0,
+    "failedRequests": 0,
+    "goalSelections": {
+      "energy": 2,
+      "sleep": 2,
+      "weight_management": 2
+    },
+    "errors": [],
+    "averageResponseTime": 0,
+    "uniqueIPs": [],
+    "firstRequest": null,
+    "lastRequest": null
   }
 }

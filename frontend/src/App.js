@@ -1,12 +1,15 @@
 import React from 'react';
-import PeptideSuggestionsApp from './components/PeptideSuggestionsApp';
+import { AuthProvider } from './contexts/AuthContext';
+import MainApp from './components/MainApp';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <PeptideSuggestionsApp />
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <MainApp />
+      </div>
+    </AuthProvider>
   );
 }
 

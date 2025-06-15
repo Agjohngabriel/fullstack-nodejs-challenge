@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { Download, RefreshCw, AlertCircle, CheckCircle, Calendar, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const PeptideSuggestionsApp = () => {
+  const { user, makeAuthenticatedRequest } = useAuth();
   const [formData, setFormData] = useState({
     age: '',
     healthGoal: ''
@@ -11,74 +13,65 @@ const PeptideSuggestionsApp = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const healthGoals = [
-    { value: 'energy', label: 'Energy & Vitality' },
-    { value: 'sleep', label: 'Better Sleep' },
-    { value: 'focus', label: 'Mental Focus' },
-    { value: 'recovery', label: 'Muscle Recovery' },
-    { value: 'longevity', label: 'Anti-Aging' }
+  const healthGoalOptions = [
+    { value: '', label: 'Select your health goal' },
+    { value: 'energy', label: '⚡ Energy & Vitality' },
+    { value: 'sleep', label: '😴 Better Sleep' },
+    { value: 'focus', label: '🧠 Mental Focus' },
+    { value: 'recovery', label: '💪 Recovery & Repair' },
+    { value: 'weight_management', label: '⚖️ Weight Management' },
+    { value: 'immune_support', label: '🛡️ Immune Support' }
   ];
 
-  const validateForm = () => {
-    if (!formData.age) {
-      setError('Age is required');
-      return false;
-    }
-    
-    const ageNum = parseInt(formData.age);
-    if (isNaN(ageNum) || ageNum < 18 || ageNum > 120) {
-      setError('Please enter a valid age between 18 and 120');
-      return false;
-    }
-
-    if (!formData.healthGoal) {
-      setError('Please select a health goal');
-      return false;
-    }
-
-    return true;
-  };
-
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    
-    // Clear error when user starts typing
+
+    // Clear messages when user starts typing
     if (error) setError('');
     if (success) setSuccess(false);
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    if (!formData.age || !formData.healthGoal) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    if (formData.age < 18 || formData.age > 120) {
+      setError('Age must be between 18 and 120');
+      return;
+    }
 
     setLoading(true);
     setError('');
-    setSuggestions([]);
+    setSuccess(false);
 
     try {
-      const response = await fetch('http://localhost:3001/suggestions', {
+      const response = await makeAuthenticatedRequest('/suggestions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           age: parseInt(formData.age),
-          goal: formData.healthGoal
+          healthGoal: formData.healthGoal
         })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get suggestions');
-      }
-
       const data = await response.json();
-      setSuggestions(data.suggestions || []);
-      setSuccess(true);
-      
+
+      if (response.ok && data.success) {
+        setSuggestions(data.suggestions);
+        setSuccess(true);
+      } else {
+        setError(data.error?.message || 'Failed to get suggestions. Please try again.');
+      }
     } catch (err) {
       if (err.name === 'TypeError' && err.message.includes('fetch')) {
         setError('Unable to connect to server. Please make sure the backend is running on port 3001.');
@@ -100,13 +93,29 @@ const PeptideSuggestionsApp = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <div className="max-w-2xl mx-auto">
+        {/* Welcome Message for Authenticated Users */}
+        {user && (
+          <div className="bg-white rounded-xl shadow-sm p-4 mb-6 border-l-4 border-blue-500">
+            <div className="flex items-center">
+              <User className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-gray-700">
+                Welcome back, <span className="font-medium text-blue-600">{user.firstName || user.email}</span>! 
+                Get your personalized recommendations below.
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             🧬 Peptide Suggestions
           </h1>
           <p className="text-gray-600">
-            Get personalized peptide recommendations based on your health goals
+            {user 
+              ? 'Get personalized peptide recommendations based on your health goals' 
+              : 'Get peptide recommendations based on your health goals'
+            }
           </p>
         </div>
 
@@ -145,10 +154,9 @@ const PeptideSuggestionsApp = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                 disabled={loading}
               >
-                <option value="">Select your primary health goal</option>
-                {healthGoals.map(goal => (
-                  <option key={goal.value} value={goal.value}>
-                    {goal.label}
+                {healthGoalOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
                   </option>
                 ))}
               </select>
@@ -156,94 +164,88 @@ const PeptideSuggestionsApp = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-                <AlertCircle size={20} />
-                <span>{error}</span>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
+                <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Success Message */}
+            {success && suggestions.length > 0 && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                <p className="text-green-700">
+                  Great! We've generated {suggestions.length} personalized recommendations for you.
+                  {user && ' These have been saved to your account history.'}
+                </p>
               </div>
             )}
 
             {/* Submit Button */}
-            <button
-              type="button"
-              onClick={handleSubmit}
-              disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 size={20} className="animate-spin" />
-                  Getting Suggestions...
-                </>
-              ) : (
-                'Get Peptide Suggestions'
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    🔬 Get Suggestions
+                  </>
+                )}
+              </button>
+
+              {suggestions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                >
+                  Reset
+                </button>
               )}
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Success Message */}
-        {success && suggestions.length > 0 && (
-          <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 mb-6">
-            <CheckCircle size={20} />
-            <span>Successfully retrieved {suggestions.length} personalized suggestions!</span>
-          </div>
-        )}
-
-        {/* Suggestions Results */}
+        {/* Results Section */}
         {suggestions.length > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Your Personalized Suggestions
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Your Recommendations
               </h2>
-              <button
-                onClick={resetForm}
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-              >
-                New Search
-              </button>
+              {user && (
+                <div className="flex items-center text-sm text-gray-500">
+                  <Calendar className="w-4 h-4 mr-1" />
+                  Saved to your history
+                </div>
+              )}
             </div>
-            
+
             <div className="space-y-4">
               {suggestions.map((suggestion, index) => (
                 <div
                   key={index}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
                 >
-                  <h3 className="font-semibold text-lg text-gray-800 mb-2">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
                     {suggestion.name}
                   </h3>
                   <p className="text-gray-600 leading-relaxed">
                     {suggestion.description}
                   </p>
-                  {suggestion.dosage && (
-                    <div className="mt-2 text-sm text-blue-600">
-                      <strong>Suggested Dosage:</strong> {suggestion.dosage}
-                    </div>
-                  )}
-                  {suggestion.timing && (
-                    <div className="mt-1 text-sm text-blue-600">
-                      <strong>Best Time:</strong> {suggestion.timing}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
-
-            {/* Disclaimer */}
-            <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>Disclaimer:</strong> These suggestions are for informational purposes only. 
-                Always consult with a healthcare professional before starting any new supplement regimen.
-              </p>
-            </div>
           </div>
         )}
-
-        {/* Footer */}
-        <div className="text-center mt-8 text-gray-500 text-sm">
-          <p>Powered by AI-driven peptide research and recommendations</p>
-        </div>
       </div>
     </div>
   );
